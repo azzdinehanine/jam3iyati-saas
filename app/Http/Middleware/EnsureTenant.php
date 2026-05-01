@@ -9,9 +9,9 @@ class EnsureTenant {
         if (!$user) return redirect()->route('login');
         if ($user->role === 'super_admin') return $next($request);
         if (!$user->tenant_id) abort(403, 'No tenant');
-        if ($user->tenant && !$user->tenant->is_active) {
+        if ($user->tenant && in_array($user->tenant->status, ['rejected','suspended'])) {
             Auth::logout();
-            return redirect()->route('login')->withErrors(['email' => 'Tenant suspended']);
+            return redirect()->route('login')->withErrors(['email' => 'جمعيتك معلقة']);
         }
         app()->instance('currentTenant', $user->tenant);
         return $next($request);
